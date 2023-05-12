@@ -1,0 +1,19 @@
+---
+  - name: Install RPM with Satellite certificate
+    yum:
+      name: "{{ rhsm.cert_rpm }}"
+      disable_gpg_check: true
+      state: present
+    when:
+    - rhsm is defined
+    - rhsm.cert_rpm is defined
+  - name: Define retries variable
+    set_fact:
+      retries: 0
+  - name: Register with RHSM
+    include_tasks: register_rhsm.yml
+  - name: Install Katello agent
+    yum:
+      name:
+      - katello-agent
+      - insights-client

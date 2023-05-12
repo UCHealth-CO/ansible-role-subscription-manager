@@ -1,0 +1,9 @@
+---
+  galaxy_info:
+    role_name: ansible-role-subscription-manager
+    author: UC Health
+    description: Ansible role to managesubscription manager
+    company: UC Health
+  collections: []
+  dependencies: []
+...
