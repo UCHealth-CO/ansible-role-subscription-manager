@@ -1,19 +1,40 @@
 ---
   - name: Install RPM with Satellite certificate
-    yum:
+    ansible.builtin.dnf:
       name: "{{ rhsm.cert_rpm }}"
       disable_gpg_check: true
       state: present
     when:
     - rhsm is defined
     - rhsm.cert_rpm is defined
-  - name: Define retries variable
-    set_fact:
-      retries: 0
-  - name: Register with RHSM
-    include_tasks: register_rhsm.yml
-  - name: Install Katello agent
-    yum:
+    become: yes
+  - name: Register with satellite
+    #block:
+    #- name: debug vars
+    #  debug:
+    #    msg: "{{ rhsm }}"
+    redhat_subscription:
+      state: "{{ rhsm.state }}"
+      server_hostname: "{{ rhsm.server_hostname }}"
+      activationkey: "{{ rhsm.activationkey }}"
+      org_id: "{{ rhsm.org_id }}"
+      #auto_attach: "{{ rhsm.auto_attach }}"
+      #pool_ids: "{{ rhsm.pool_ids }}"
+    when: rhsm is defined
+    register: rhsm
+    become: yes
+  - name: Enable the satellite repo
+    community.general.rhsm_repository:
+      name: satellite-client-6-for-rhel-8-x86_64-rpms
+      state: enabled
+    when:
+    - rhsm is defined
+    become: yes
+  - name: Install katello-agent and insights-client
+    ansible.builtin.dnf:
       name:
-      - katello-agent
-      - insights-client
+        - katello-agent
+        - insights-client
+      state: present
+    when:
+    - rhsm is defined
