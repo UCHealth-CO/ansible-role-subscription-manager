@@ -1,21 +1,25 @@
 ---
-  - name: Run command
-    block:
-    - redhat_subscription:
-        state: "{{ rhsm.state }}"
-        server_hostname: "{{ rhsm.server_hostname }}"
-        activationkey: "{{ rhsm.activationkey }}"
-        org_id: "{{ rhsm.org_id }}"
-        pool_ids: "{{ rhsm.pool_ids }}"
-      when: rhsm is defined
-      register: rhsm
+  - name: Register
+    #block:
+    #- name: debug vars
+    #  debug:
+    #    msg: "{{ rhsm }}"
+    redhat_subscription:
+      state: "{{ rhsm.state }}"
+      server_hostname: "{{ rhsm.server_hostname }}"
+      activationkey: "{{ rhsm.activationkey }}"
+      org_id: "{{ rhsm.org_id }}"
+      #auto_attach: "{{ rhsm.auto_attach }}"
+      #pool_ids: "{{ rhsm.pool_ids }}"
+    when: rhsm is defined
+    register: rhsm
     #- name: Show registration return value
     #  ansible.builtin.debug:
     #    msg: "{{ rhsm }}"
-    rescue:
-    - name: Increment retry interval
-      set_fact:
-        retries: "{{ retries|int + 1 }}"
-    - name: Try again
-      include_tasks: register_rhsm.yml
-      when: retries|int < 2
+    #rescue:
+    #- name: Increment retry interval
+    #  set_fact:
+    #    retries: "{{ retries|int + 1 }}"
+    #- name: Try again
+    #  include_tasks: register_rhsm.yml
+    #  when: retries|int < 2
